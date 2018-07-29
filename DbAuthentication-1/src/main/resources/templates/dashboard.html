@@ -1,0 +1,79 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>Spring Boot Test Application</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />  
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="../include/bootstrap.min.css">
+  <script src="../include/jquery.min.js"></script>
+  <script src="../include/bootstrap.min.js"></script>
+  <style>
+  	.user-image{height:50px;width:50px;}
+  	.profile-pic{height:180px;width:160px;border:2px solid gray;}
+  </style>
+  </head>
+<body style="font-family:lucida handwriting"> 
+ 	<div class="container">
+ 		<div class="jumbotron" style="height:150px;">
+			<div class="col-md-6">
+				 <p class="text-left">SpringBoot Security</p><h6 >Demo Application</h6>
+			</div>
+			<div class="col-md-6">
+			<ul class="list-inline">
+				<li><a th:href="@{/user/dashboard}" class="btn btn-primary">Profile</a></li>
+			 	<li><form  th:action="@{/logout}" method="post">				
+						<input type ="submit" value ="Logout" class="btn btn-danger"/>
+					</form> 
+				</li>
+			</ul>
+			</div>
+		</div>
+		<div class="row" >
+		 <div class="col-md-2 text-center">
+		 		
+		 		   <img th:if= "${loggedInUser.base64Image != null}" th:src="*{'data:image/png;base64,'+loggedInUser.base64Image}"
+     	       				class="img img-responsive profile-pic" alt="User Image" />
+     	      			 <img th:if= "${loggedInUser.base64Image == null}" src="../include/avatar.png"	
+     	       				class="img img-responsive  profile-pic " alt="User Image" />
+     	       	<button class="btn btn-default" data-toggle="modal" data-target="#myModal">Change Photo</button> 					
+				
+		</div>
+		  <div class="col-md-4">
+		  <table class="table table-hover table-responsive table-bordered">
+		   <tr class="active"><td colspan="2" class="text-center">User Details</td></tr>
+		   <tr class="success"><td>Name : </td><td><span th:text="${loggedInUser.firstName}"></span><span th:text="${loggedInUser.lastName}"></span></td></tr>
+		    <tr class="warning"><td>Email : </td><td th:text="${loggedInUser.email}"></td></tr>
+		    <tr class="info"><td>Mobile No. : </td><td th:text="${loggedInUser.mobNo}"></td></tr>
+		    <tr class="danger"><td>Gender. : </td><td th:text="${loggedInUser.gender}"></td></tr>
+		    
+		  </table>
+		  
+		  </div>
+		  <div class="col-md-4"></div>
+			
+		</div>
+	</div>
+	
+	 <!-- Modal -->
+  <div class="modal fade" id="myModal" role="dialog">
+    <div class="modal-dialog modal-sm">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Upload Profile Photo</h4>
+        </div>
+        <div class="modal-body">
+         		<form action="/user/uploadImage" id="form" method="post" enctype="multipart/form-data">
+     		 		<input  type="file" name="uploadFile">
+     		 		<!-- <input type="submit" value="upload"> -->
+     			</form>
+        </div>
+        <div class="modal-footer">
+      	  <button type="button" class="btn btn-default" onclick="document.getElementById('form').submit()">Upload</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

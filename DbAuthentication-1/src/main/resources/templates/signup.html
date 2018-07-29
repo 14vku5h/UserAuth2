@@ -1,0 +1,57 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header ::scripts"></head>
+<body style="font-family:lucida handwriting"> 
+   <div class="container text-center">
+   <div th:include="fragments/header::header" ></div>
+
+     <div class="row">
+        <div class="col-md-4"></div>
+        <div class="col-md-4">
+        <h6>Register</h6>
+        <form action="/register" method="post" >
+        <div th:if="${param.error}">
+	 <div class="alert alert-danger"> 
+	 	<a href="#" class="close" data-dismiss="alert" area-label="close">&times;</a>
+          Email already exists !
+     </div> 
+</div>
+        <table>
+        <tr>
+        	<td><input type="text" name="firstName" placeholder=" first name..." required></td>
+        	<td><input type="text" name="lastName" placeholder=" last name..."></td>
+        </tr>
+        <tr>
+       		 <td><input type="email" name="email" placeholder=" email..." required></td>
+       		 <td><input type="text" name="mobNo" placeholder=" mobile no..." required></td>
+        </tr>
+        <tr>
+       		 <td><input type="password" name="password" id="pass1" placeholder=" new password..." required></td>
+       		 <td><input type="password" name="confirmPassword" id="pass2" placeholder="confirm password..." required></td>
+        </tr>
+        <tr>
+       		
+        </tr>
+        <tr>
+       		 <td colspan="2"><input type="submit" value="Register" onsubmit="validate()" class="btn btn-default">
+       		 <input type="reset" value="Reset" class="btn btn-default"></td>
+        </tr>
+        </table>
+        </form>
+        </div>
+       <div class="col-md-4"></div>
+        </div>
+    
+<script type="text/javascript">
+function validate(){
+	var pass1 = document.getElementById("pass1").value;
+	var pass2 = document.getElementById("pass2").value;
+	if(pass1 != pass2){
+	 return false;	//alert("Password not matched !");
+	}
+	return true;
+}
+</script>
+</div>
+</body>
+</html>

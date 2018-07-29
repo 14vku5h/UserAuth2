@@ -1,0 +1,59 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Student Management System</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />  
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+  <link rel="stylesheet" href="include/bootstrap.min.css">
+  <script src="include/jquery.min.js"></script>
+  <script src="include/bootstrap.min.js"></script>
+  <style>
+  h2{font-family:lucida handwriting;}
+  </style>
+</head>
+<body>
+<div class="container ">
+
+    <div class="jumbotron" style="height:150px;">
+    	<h2>Student Management System</h2>
+    </div>
+    
+  <div class="row">
+        <ul class="list-inline">
+        <li><a href="/">Home</a></li> 
+        <li><a href="/signup">Sign Up</a></li> 
+        <li><a href="/signin">Sign In</a></li>
+        <li><a href="/dashboard">Dashboard</a></li>
+        </ul>
+  </div>
+        
+        <div class="row">
+       
+        <div class="col-md-6">
+        <h2>Login</h2>
+         	<form action="/login" method="post" enctype="application/x-www-form-urlencoded">
+         	 <span th:text="${msg}"></span>
+         	<span th:text="${errorMsg}" style="color:red;"></span>
+         	  <table>
+         	    <tr>
+       		     	<td>Email or Username :</td>
+       		 		<td><input type="text" name="email"></td>
+      		  </tr>
+      		  <tr>
+       		 		<td>Password:</td>
+       		 		<td><input type="password" name="password"></td>
+       		 		
+        	</tr>
+        	<tr>
+        			<td></td>
+        			<td><input type="submit" value="Login" class="btn btn-default"></td>
+        	</tr>
+         	  </table>
+         	</form>
+        </div>
+        </div>
+
+</div>
+</body>
+</html>
