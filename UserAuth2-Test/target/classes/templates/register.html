@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="User account registration" />
+  <meta name="author" content="Lavkush Verma" />
+  <link rel="icon" href="favicon.ico" />
+
+  <title>Registration Page</title>
+
+  <!-- Bootstrap core CSS -->
+  <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+  rel="stylesheet"
+  integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
+  crossorigin="anonymous" />
+
+  <link th:href="@{css/style.css}" rel="stylesheet" />
+</head>
+
+<body >
+  <div class="container">
+  	<div class="row">
+  	  <div class="col-md-4 "></div>  
+  <div class="col-md-4 text-center">
+    <div>
+      <hr/>
+      <h3 class="text-center">New User Registration</h3>
+ 	  <hr/>
+   <div th:if="${confirmationMessage}">
+      <div  class="alert alert-success" role="alert" th:text=${confirmationMessage}></div>
+          
+          
+  </div>
+  <div th:unless="${confirmationMessage}">
+  <!-- autocomplete="off" -->
+      <form  action="#" th:action="@{/register}"
+        th:object="${user}"  method="post" role="form"
+        data-toggle="validator">
+
+       
+
+        <div th:if="${errorMessage}"
+          class="alert alert-danger" role="alert"
+          th:text="${errorMessage}"></div>
+
+		<div th:if="${alreadyRegisteredMessage}"
+          class="alert alert-warning" role="alert"
+          th:text="${alreadyRegisteredMessage}"></div>
+          
+        <div th:if="${#fields.hasErrors('firstname')}"
+          th:errors="*{firstname}"
+          class="validation-message alert alert-danger" role="alert"></div>
+
+        <div th:if="${#fields.hasErrors('lastname')}"
+          th:errors="*{lastname}"
+          class="validation-message alert alert-danger" role="alert"></div>
+
+        <div th:if="${#fields.hasErrors('email')}" th:errors="*{email}"
+          class="validation-message alert alert-danger" role="alert"></div>
+
+        <div class="form-group input-group has-feedback">
+          <label th:if="${#fields.hasErrors('firstname')}"
+            th:errors="*{firstname}" class="validation-message"></label> 
+          <span class="input-group-addon">
+            <span class="glyphicon glyphicon-user"></span>
+          </span>
+          
+          <input type="text" th:field="*{firstname}"
+            placeholder="First Name" class="form-control" required />
+          <span class="glyphicon form-control-feedback"
+            aria-hidden="true"></span>
+        </div>
+
+        <div class="form-group input-group has-feedback">
+          <span class="input-group-addon">
+            <span class="glyphicon glyphicon-user"></span>
+          </span>
+          <input type="text" th:field="*{lastname}"
+            placeholder="Last Name" class="form-control" required />
+          <span class="glyphicon form-control-feedback"
+            aria-hidden="true"></span>
+        </div>
+
+        <div class="form-group input-group has-feedback">
+          <span class="input-group-addon">
+            <span class="glyphicon glyphicon-envelope"></span>
+          </span>
+          <input type="email" th:field="*{email}"
+            placeholder="Email Address" class="form-control"
+            data-error="This email address is invalid" required />
+          <span class="glyphicon form-control-feedback"
+            aria-hidden="true"></span>
+
+        </div>
+        
+        
+        
+        <button type="submit"
+          class="btn btn-primary block full-width m-b">Register</button>
+
+      </form>
+     </div>
+    </div>
+  </div>
+  <div class="col-md-4"></div>
+</div>
+</div>
+ <!-- jQuery-->
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    
+  <!-- Bootstrap -->
+  <script
+    src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+    integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+    crossorigin="anonymous"></script>
+
+  <!-- Bootstrap Validator plugin -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/1000hz-bootstrap-validator/0.11.9/validator.min.js"></script>
+
+ 
+  <script>
+		$(document).ready(function() {
+		    $('#passwordForm').formValidation({
+		        framework: 'bootstrap',
+		        icon: {
+		            valid: 'glyphicon glyphicon-ok',
+		            invalid: 'glyphicon glyphicon-remove',
+		            validating: 'glyphicon glyphicon-refresh'
+		        },
+		        fields: {
+		        
+		            password: {
+		                validators: {
+		                    notEmpty: {
+		                        message: 'The password is required'
+		                    },
+		                    callback: {
+		                        callback: function(value, validator, $field) {
+		                            var password = $field.val();
+		                            if (password == '') {
+		                                return true;
+		                            }
+
+		                            var result  = zxcvbn(password),
+		                                score   = result.score,
+		                                message = result.feedback.warning || 'The password is weak';
+
+		                            // Update the progress bar width and add alert class
+		                            var $bar = $('#strengthBar');
+		                            switch (score) {
+		                                case 0:
+		                                    $bar.attr('class', 'progress-bar progress-bar-danger')
+		                                        .css('width', '1%');
+		                                    break;
+		                                case 1:
+		                                    $bar.attr('class', 'progress-bar progress-bar-danger')
+		                                        .css('width', '25%');
+		                                    break;
+		                                case 2:
+		                                    $bar.attr('class', 'progress-bar progress-bar-danger')
+		                                        .css('width', '50%');
+		                                    break;
+		                                    register             case 3:
+		                                    $bar.attr('class', 'progress-bar progress-bar-warning')
+		                                        .css('width', '75%');
+		                                    break;
+		                                case 4:
+		                                    $bar.attr('class', 'progress-bar progress-bar-success')
+		                                        .css('width', '100%');
+		                                    break;
+		                            }
+
+		                            // We will treat the password as an invalid one if the score is less than 3
+		                            if (score < 3) {
+		                                return {
+		                                    valid: false,
+		                                    message: message
+		                                }
+		                            }
+
+		                            return true;
+		                        }
+		                    }
+		                }
+		            }
+		        }
+		    });
+		});
+		</script>
+
+</body>
+
+</html>
