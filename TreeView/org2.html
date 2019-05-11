@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+    <html>
+    <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="main.css"/>
+    <title>ftree.js Demo</title>
+    </head>
+    <body onload="initialize()">
+    <div id="header">
+        Family Name
+    </div>
+    <div id="control_panel">
+        <div class="section">
+            Control Panel
+        </div>
+        <button id="add_child">
+            Add Child
+        </button>
+        <button id="remove_node">
+            Remove Node
+        </button>
+        <div class="section">
+            Information Panel
+        </div>
+        <div id="information_panel">
+
+        </div>
+    </div>
+    <div id="divider">
+
+    </div>
+    <div id="main">
+    <h1>Organisation Structure</h1>
+
+     </div>
+        <canvas id="canvas"></canvas>
+    </div>
+
+    <!--script src="tree.js"></script>
+    <script src="main.js"></script-->
+
+
+    <script type="text/javascript">
+      //comment
+var maintree;
+function initialize() {
+    var canvas = document.getElementById("canvas"),
+        context = canvas.getContext("2d"),
+        tree = TREE.create("Maekar I"),
+        nodes = TREE.getNodeList(tree),
+        currNode = tree,
+        add_child_button = document.getElementById("add_child"),
+        remove_node = document.getElementById("remove_node");
+
+    canvas.addEventListener("click", function (event) {
+        var x = event.pageX - canvas.offsetLeft,
+            y = event.pageY - canvas.offsetTop;
+        for (var i = 0; i < nodes.length; i++) {
+            if (x > nodes[i].xPos && y > nodes[i].yPos && x < nodes[i].xPos + nodes[i].width && y < nodes[i].yPos + nodes[i].height) {
+                currNode.selected(false);
+                nodes[i].selected(true);
+                currNode = nodes[i];
+                TREE.clear(context);
+                TREE.draw(context, tree);
+                updatePage(currNode);
+                break;
+            }
+        }
+    }, false);
+
+    canvas.addEventListener("mousemove", function (event) {
+        var x = event.pageX - canvas.offsetLeft,
+            y = event.pageY - canvas.offsetTop;
+        for (var i = 0; i < nodes.length; i++) {
+            if (x > nodes[i].xPos && y > nodes[i].yPos && x < nodes[i].xPos + nodes[i].width && y < nodes[i].yPos + nodes[i].height) {
+                canvas.style.cursor = "pointer";
+                break;
+            }
+            else {
+                canvas.style.cursor = "auto";
+            }
+        }
+    }, false);
+    add_child_button.addEventListener('click', function (event) {
+        currNode.addChild(TREE.create("Child of " + currNode.text));
+        TREE.clear(context);
+        nodes = TREE.getNodeList(tree);
+        TREE.draw(context, tree);
+    }, false);
+    remove_node.addEventListener('click', function (event) {
+        TREE.destroy(currNode);
+        TREE.clear(context);
+        nodes = TREE.getNodeList(tree);
+        TREE.draw(context, tree);
+    }, false);
+    context.canvas.width = document.getElementById("main").offsetWidth;
+    context.canvas.height = document.getElementById("main").offsetHeight;
+    populateDummyData(tree);
+    nodes = TREE.getNodeList(tree);
+    TREE.draw(context, tree);
+    maintree = tree;
+}
+
+function updatePage(tree) {
+    var info_panel = document.getElementById("information_panel");
+    var header = document.getElementById("header");
+    header.innerHTML = "Targaryen Family";
+    var info_panel_html = "<ul>";
+    info_panel_html += "<li>First Name: " +tree.text +"</li>";
+    info_panel_html += "<li>Last Name: " +"Targaryen" +"</li>";
+    info_panel_html += "</ul>";
+    info_panel.innerHTML = info_panel_html;
+}
+
+function populateDummyData(tree) {
+    tree.selected(true);
+    updatePage(tree);
+    tree.addChild(TREE.create("Aerion"));
+    tree.addChild(TREE.create("Daeron"));
+    tree.addChild(TREE.create("Aemon"));
+    tree.addChild(TREE.create("Aegon V"));
+    tree.addChild(TREE.create("Rhae"));
+    tree.addChild(TREE.create("Daella"));
+    tree.getChildAt(0).addChild(TREE.create("Maegor"));
+    tree.getChildAt(1).addChild(TREE.create("Vaella"));
+    tree.getChildAt(3).addChild(TREE.create("Duncan"));
+    tree.getChildAt(3).addChild(TREE.create("Jaehaerys II"));
+    tree.getChildAt(3).addChild(TREE.create("Shaera"));
+    tree.getChildAt(3).addChild(TREE.create("Daeron"));
+    tree.getChildAt(3).addChild(TREE.create("Rhaelle"));
+    tree.getDescendent(11).addChild(TREE.create("Aerys II"));
+    tree.getDescendent(11).addChild(TREE.create("Rhaella"));
+    tree.getDescendent(15).addChild(TREE.create("Rhaegar"));
+    tree.getDescendent(15).addChild(TREE.create("Shaena"));
+    tree.getDescendent(15).addChild(TREE.create("Daeron"));
+    tree.getDescendent(15).addChild(TREE.create("Aegon"));
+    tree.getDescendent(15).addChild(TREE.create("Jaehaerys"));
+    tree.getDescendent(15).addChild(TREE.create("Viserys"));
+    tree.getDescendent(15).addChild(TREE.create("Daenerys"));
+    tree.getDescendent(17).addChild(TREE.create("Rhaenys"));
+    tree.getDescendent(17).addChild(TREE.create("Aegon"));
+    tree.getDescendent(23).addChild(TREE.create("Rhaego"));
+}
+    </script>
+
+    <script type="text/javascript">
+      var TREE = (function () {
+    "use strict";
+    var uID = 0,
+        //TODO: Add data structure to store: First, Middle, Last Name, DOB, Age, etc.
+        Tree = function (text, parentId, width, height, color, bgcolor, treeData) {
+            this.uid = uID += 1;
+            this.parentId = parentId || -1;
+            this.text = text;
+            this.width = width || 100;
+            this.height = height || 50;
+            this.color = color || "black";
+            this.bgcolor = bgcolor || "white";
+            this.treeData = treeData || {};
+            this.xPos = 0;
+            this.yPos = 0;
+            this.prelim = 0;
+            this.modifier = 0;
+            this.leftNeighbor = null;
+            this.rightNeighbor = null;
+            this.parentTree = null;
+            this.children = [];
+        };
+
+    /**
+     * Gets the vertical level of the tree.
+     * @return {number} The number of levels from the root node.
+     */
+    Tree.prototype.getLevel = function () {
+        return this.parentId === -1 ? 0 : this.parentTree.getLevel() + 1;
+    };
+
+    /**
+     * Sets the text color of the node.
+     * @param {string} color The color of the node.
+     */
+    Tree.prototype.setColor = function (color) {
+        this.color = color;
+    };
+
+    /**
+     * Sets the background color of the node.
+     * @param {string} color The background color of the node.
+     */
+    Tree.prototype.setbgColor = function (color) {
+        this.bgcolor = color;
+    };
+
+    Tree.prototype.selected = function (bool) {
+        if (bool) {
+            this.setColor("white");
+            this.setbgColor("red");
+        } else {
+            this.setColor("black");
+            this.setbgColor("white");
+        }
+    };
+
+    Tree.prototype.numChildren = function () {
+        return this.children.length;
+    };
+
+    Tree.prototype.getLeftSibling = function () {
+        return this.leftNeighbor && this.leftNeighbor.parentTree === this.parentTree ? this.leftNeighbor : null;
+    };
+
+    Tree.prototype.getRightSibling = function () {
+        return this.rightNeighbor && this.rightNeighbor.parentTree === this.parentTree ? this.rightNeighbor : null;
+    };
+
+    Tree.prototype.getChildAt = function (index) {
+        return this.children[index];
+    };
+
+    Tree.prototype.getChild = function (id) {
+        var i;
+        for (i = 0; i < this.children.length; i++) {
+            if (this.children[i].uid === id) {
+                return this.children[i];
+            }
+        }
+    };
+
+    Tree.prototype.getChildrenCenter = function () {
+        var firstChild = this.getFirstChild(),
+            lastChild = this.getLastChild();
+        return firstChild.prelim + (lastChild.prelim - firstChild.prelim + lastChild.width) / 2;
+    };
+
+    Tree.prototype.getFirstChild = function () {
+        return this.getChildAt(0);
+    };
+
+    Tree.prototype.getLastChild = function () {
+        return this.getChildAt(this.numChildren() - 1);
+    };
+
+    Tree.prototype.addChild = function (tree) {
+        tree.parentTree = this;
+        tree.parentId = this.uid;
+        this.children.push(tree);
+    };
+
+    Tree.prototype.getDescendent = function (id) {
+        var children = this.children;
+        var found;
+        if (this.getChild(id)) {
+            return this.getChild(id);
+        }
+        else {
+            for (var i = 0; i < children.length; i++) {
+                found = children[i].getDescendent(id);
+                if (found) {
+                    return found;
+                }
+            }
+        }
+    };
+
+    return {
+        create: function (text) {
+            return new Tree(text);
+        },
+
+        destroy: function (tree) {
+            if (!tree.parentTree) {
+                alert("Removing root node not supported at this time");
+                return;
+            }
+            var children = tree.parentTree.children;
+            for (var i = 0; i < children.length; i++) {
+                if (children[i].uid === tree.uid) {
+                    children.splice(i, 1);
+                    break;
+                }
+            }
+        },
+
+        getNodeList: function (tree) {
+            var nodeList = [];
+            nodeList.push(tree);
+            for (var i = 0; i < tree.numChildren(); i++) {
+                nodeList = nodeList.concat(this.getNodeList(tree.getChildAt(i)));
+            }
+            return nodeList;
+        },
+
+        clear: function (context) {
+            context.clearRect(0, 0, context.canvas.width, context.canvas.height);
+        },
+
+        //TODO: Refactor firstwalk, secondwalk, apportion to be more readable, consise.
+        draw: function (context, tree) {
+            var config = {
+                    maxDepth: 100,
+                    levelSeparation: 40,
+                    siblingSeparation: 20,
+                    subtreeSeparation: 20,
+                    topXAdjustment: 0,
+                    topYAdjustment: 20
+                },
+                maxLevelHeight = [],
+                maxLevelWidth = [],
+                previousLevelTree = [],
+                rootXOffset = 0,
+                rootYOffset = 0,
+
+                setLevelHeight = function (tree, level) {
+                    maxLevelHeight[level] = tree.height;
+                },
+
+                setLevelWidth = function (tree, level) {
+                    maxLevelWidth[level] = tree.width;
+                },
+
+                setNeighbors = function (tree, level) {
+                    tree.leftNeighbor = previousLevelTree[level];
+                    if (tree.leftNeighbor)
+                        tree.leftNeighbor.rightNeighbor = tree;
+                    previousLevelTree[level] = tree;
+                },
+
+            //Determine the leftmost descendent of a node at a given depth.
+            //This seems to be incorrect
+                getLeftMost = function (tree, level, maxlevel) {
+                    if (level >= maxlevel) return tree;
+                    if (tree.numChildren() === 0) return null;
+                    var n = tree.numChildren();
+                    for (var i = 0; i < n; i++) {
+                        var iChild = tree.getChildAt(i);
+                        var leftmostDescendant = getLeftMost(iChild, level + 1, maxlevel);
+                        if (leftmostDescendant !== null)
+                            return leftmostDescendant;
+                    }
+                    return null;
+                },
+
+                getNodeSize = function (tree) {
+                    return tree.width;
+                },
+
+            //TODO: This needs to be reworked...such ulgy...much sadness
+                apportion = function (tree, level) {
+                    var firstChild = tree.getFirstChild(),
+                        firstChildLeftNeighbor = firstChild.leftNeighbor,
+                        modifierSumRight,
+                        modifierSumLeft,
+                        rightAncestor,
+                        leftAncestor,
+                        totalGap,
+                        subtreeAux,
+                        numSubtrees,
+                        subtreeMoveAux,
+                        singleGap;
+                    for (var k = config.maxDepth - level, j = 1; firstChild && firstChildLeftNeighbor && j <= k;) {
+                        modifierSumRight = 0;
+                        modifierSumLeft = 0;
+                        rightAncestor = firstChild;
+                        leftAncestor = firstChildLeftNeighbor;
+                        for (var l = 0; l < j; l++) {
+                            rightAncestor = rightAncestor.parentTree;
+                            leftAncestor = leftAncestor.parentTree;
+                            modifierSumRight += rightAncestor.modifier;
+                            modifierSumLeft += leftAncestor.modifier;
+                        }
+                        totalGap = (firstChildLeftNeighbor.prelim + modifierSumLeft + getNodeSize(firstChildLeftNeighbor) + config.subtreeSeparation) - (firstChild.prelim + modifierSumRight);
+                        if (totalGap > 0) {
+                            subtreeAux = tree;
+                            numSubtrees = 0;
+                            while(subtreeAux && subtreeAux != leftAncestor){
+                                numSubtrees++;
+                                subtreeAux = subtreeAux.getLeftSibling();
+                            }
+                            if (subtreeAux) {
+                                subtreeMoveAux = tree;
+                                singleGap = totalGap / numSubtrees;
+                                while(subtreeMoveAux != leftAncestor){
+                                    subtreeMoveAux.prelim += totalGap;
+                                    subtreeMoveAux.modifier += totalGap;
+                                    totalGap -= singleGap;
+                                    subtreeMoveAux = subtreeMoveAux.getLeftSibling();
+                                }
+                            }
+                        }
+                        if (!firstChild.numChildren())
+                            firstChild = getLeftMost(tree, 0, ++j);
+                        else
+                            firstChild = firstChild.getFirstChild();
+                        if (firstChild)
+                            firstChildLeftNeighbor = firstChild.leftNeighbor;
+                    }
+                },
+
+                firstWalk = function (tree, level) {
+                    var leftSibling = null;
+                    tree.xPos = 0;
+                    tree.yPos = 0;
+                    tree.prelim = 0;
+                    tree.modifier = 0;
+                    tree.leftNeighbor = null;
+                    tree.rightNeighbor = null;
+                    setLevelHeight(tree, level);
+                    setLevelWidth(tree, level);
+                    setNeighbors(tree, level);
+                    if (tree.numChildren() === 0 || level == config.maxDepth) {
+                        leftSibling = tree.getLeftSibling();
+                        if (leftSibling !== null)
+                            tree.prelim = leftSibling.prelim + getNodeSize(leftSibling) + config.siblingSeparation;
+                        else
+                            tree.prelim = 0;
+                    }
+                    else {
+                        var n = tree.numChildren();
+                        for (var i = 0; i < n; i++) {
+                            firstWalk(tree.getChildAt(i), level + 1);
+                        }
+                        var midPoint = tree.getChildrenCenter();
+                        midPoint -= getNodeSize(tree) / 2;
+                        leftSibling = tree.getLeftSibling();
+                        if (leftSibling) {
+                            tree.prelim = leftSibling.prelim + getNodeSize(leftSibling) + config.siblingSeparation;
+                            tree.modifier = tree.prelim - midPoint;
+                            apportion(tree, level);
+                        }
+                        else {
+                            tree.prelim = midPoint;
+                        }
+                    }
+                },
+
+                secondWalk = function (tree, level, X, Y) {
+                    if (level <= config.maxDepth) {
+                        tree.xPos = rootXOffset + tree.prelim + X;
+                        tree.yPos = rootYOffset + Y;
+                        if (tree.numChildren())
+                            secondWalk(tree.getFirstChild(), level + 1, X + tree.modifier, Y + maxLevelHeight[level] + config.levelSeparation);
+                        var rightSibling = tree.getRightSibling();
+                        if (rightSibling)
+                            secondWalk(rightSibling, level, X, Y);
+                    }
+                },
+
+                findMinX = function (tree) {
+                    var nodes = TREE.getNodeList(tree);
+                    var min = 0;
+                    for (var i = 0; i < nodes.length; i++){
+                        if(nodes[i].xPos < min)
+                            min = nodes[i].xPos;
+                    }
+                    return min;
+                },
+
+                positionTree = function (tree) {
+                    maxLevelHeight = [];
+                    maxLevelWidth = [];
+                    previousLevelTree = [];
+                    firstWalk(tree, 0);
+                    rootXOffset = config.topXAdjustment + tree.xPos;
+                    rootYOffset = config.topYAdjustment + tree.yPos;
+                    secondWalk(tree, 0, 0, 0);
+                    rootXOffset += Math.abs(findMinX(tree));
+                    secondWalk(tree, 0, 0, 0);
+                },
+
+                drawNode = function (tree) {
+                    var x = tree.xPos,
+                        y = tree.yPos,
+                        width = tree.width,
+                        height = tree.height,
+                        text = tree.text,
+                        textWidth = context.measureText(text).width;
+                    context.beginPath();
+                    context.moveTo(x, y);
+                    context.lineTo(x, y + height);
+                    context.lineTo(x + width, y + height);
+                    context.lineTo(x + width, y);
+                    context.lineTo(x, y);
+                    context.lineWidth = 1;
+                    context.fillStyle = tree.bgcolor;
+                    context.fill();
+                    context.stroke();
+                    context.strokeStyle = tree.color;
+                    context.textBaseline = 'middle';
+                    context.strokeText(text, (x + width / 2) - textWidth / 2, y + height / 2, width);
+                    context.strokeStyle = "black";
+                    if (tree.children.length > 0) {
+                        context.beginPath();
+                        context.moveTo(x + width / 2, y + height);
+                        context.lineTo(x + width / 2, y + height + config.levelSeparation / 2);
+                        context.moveTo(tree.getFirstChild().xPos + tree.getFirstChild().width / 2, y + height + config.levelSeparation / 2);
+                        context.lineTo(tree.getLastChild().xPos + tree.getLastChild().width / 2, y + height + config.levelSeparation / 2);
+                        context.stroke();
+                    }
+                    if (tree.parentId != -1) {
+                        context.beginPath();
+                        context.moveTo(x + width / 2, y);
+                        context.lineTo(x + width / 2, y - config.levelSeparation / 2);
+                        context.stroke();
+                    }
+                    for (var i = 0; tree.numChildren() > 0 && i < tree.numChildren(); i++) {
+                        drawNode(tree.getChildAt(i));
+                    }
+                };
+
+            positionTree(tree);
+            this.clear(context);
+            drawNode(tree);
+        }
+    };
+}());
+    </script>
+  </body>
+</html>
